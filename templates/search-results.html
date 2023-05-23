@@ -3,9 +3,10 @@
 {% block title %}Search Results{% endblock %}
 
 {% block content %}
-	<p>test</p>
-	<p>There were {{ count }} results for your search. </p>
+	<p>There were {{ count }} results for your search "{{ searchterm }}". </p>
 	<p>Results:</p>
-	   {{ results }}
+	<div class="row">
+		{{ results }}
+	</div>
 
 {% endblock %}

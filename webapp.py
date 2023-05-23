@@ -100,7 +100,8 @@ def renderResults():
     with open("artdata.json") as art_data:
         data = json.load(art_data)
     results = get_search_results(data)
-    return render_template('search-results.html', count=results[0], results=results[1])
+    searchterm = str(request.args['searchterm'])
+    return render_template('search-results.html', count=results[0], results=results[1], searchterm = str(request.args['searchterm']))
     
 def get_each(data):
     titles = []
@@ -117,7 +118,7 @@ def get_each(data):
             addresses.append(address)
         if (artist not in artists):
             artists.append(artist)
-        pieces += Markup("<img src=\"" + address + "\"" + "alt=\"" + title + "\">" + "<p>" + title + " by " + artist + "</p>")
+        pieces += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + title + "</div></div></div>")
     return pieces    
 
 def get_search_results(data):
@@ -125,10 +126,9 @@ def get_search_results(data):
     results = ""
     searchterm = str(request.args['searchterm'])
     for p in data:
-        if searchterm == p["title"] or searchterm == p["artistName"]:
+        if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
             count = count + 1
-            results += Markup("<img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\">")
-    print(count)
+            results += Markup("<div class=\"col-md-2 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + p["title"] + "</div></div></div>")
     return [int(count), results]
     
 
