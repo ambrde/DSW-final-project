@@ -7,6 +7,14 @@
 {% block content %}
 	<h1>This is Page 1</h1>
 	
-	{{ pieces }}
+	<form action="/search-results">
+		<!-- <label for="searchterm">Search:</label><br> -->
+		<input type="text" id="searchterm" name="searchterm" placeholder="Search">
+		<input type="submit" value="Submit">
+	</form>
+	
+	<div class="row">
+		{{ pieces }}
+	</div>
 
 {% endblock %}

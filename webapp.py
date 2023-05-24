@@ -94,7 +94,15 @@ def renderPage1():
 @app.route('/page2')
 def renderPage2():
     return render_template('page2.html')
-
+    
+@app.route('/search-results')
+def renderResults():
+    with open("artdata.json") as art_data:
+        data = json.load(art_data)
+    results = get_search_results(data)
+    searchterm = str(request.args['searchterm'])
+    return render_template('search-results.html', count=results[0], results=results[1], searchterm = str(request.args['searchterm']))
+    
 def get_each(data):
     titles = []
     addresses = []
@@ -110,19 +118,18 @@ def get_each(data):
             addresses.append(address)
         if (artist not in artists):
             artists.append(artist)
-        pieces += Markup("<img src=\"" + address + "\"" + "alt=\"" + title + "\">" + "<p>" + title + " by " + artist + "</p>")
-    return pieces
-    
-# def get_images(data):
-    # addresses = []
-    # images = ""
-    # for p in data:
-        # address = p["image"]
-        # if (address not in addresses):
-            # addresses.append(address)
-    # for e in addresses:
-        # images += Markup("<img src=\"" + e + "\"" + "alt=\"fix\">" + "<p>" + title + "</p>")
-    # return images
+        pieces += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + title + "</div></div></div>")
+    return pieces    
+
+def get_search_results(data):
+    count = 0
+    results = ""
+    searchterm = str(request.args['searchterm'])
+    for p in data:
+        if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
+            count = count + 1
+            results += Markup("<div class=\"col-md-2 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + p["title"] + "</div></div></div>")
+    return [int(count), results]
     
 
 #the tokengetter is automatically called to check who is logged in.
