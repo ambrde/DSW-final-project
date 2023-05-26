@@ -89,7 +89,8 @@ def renderPage1():
     with open("artdata.json") as art_data:
         data = json.load(art_data)
     pieces = get_each(data)
-    return render_template('page1.html', pieces=get_each(data))
+    modals = get_modal(data)
+    return render_template('page1.html', pieces=get_each(data), modals=get_modal(data))
 
 @app.route('/page2')
 def renderPage2():
@@ -108,17 +109,19 @@ def get_each(data):
     addresses = []
     artists = []
     pieces = ""
+    modalid = ""
     for p in data:
         title = p["title"]
         address = p["image"]
         artist = p["artistName"]
-        if (title not in titles):
-            titles.append(title)
-        if (address not in addresses):
-            addresses.append(address)
-        if (artist not in artists):
-            artists.append(artist)
-        pieces += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + title + "</div></div></div>")
+        modalid = "c" + str(p["contentId"])
+        # if (title not in titles):
+            # titles.append(title)
+        # if (address not in addresses):
+            # addresses.append(address)
+        # if (artist not in artists):
+            # artists.append(artist)
+        pieces += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + title + "</div></div>")
     return pieces    
 
 def get_search_results(data):
@@ -128,8 +131,24 @@ def get_search_results(data):
     for p in data:
         if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
             count = count + 1
-            results += Markup("<div class=\"col-md-2 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\"><div class=\"overlay\"><div class=\"text\">" + p["title"] + "</div></div></div>")
+            results += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\"><div class=\"text\">" + p["title"] + "</div></div>")
     return [int(count), results]
+    
+def get_modal(data):
+    title = ""
+    address = ""
+    artist = ""
+    year = ""
+    modalid = ""
+    modals = ""
+    for p in data:
+        title = p["title"]
+        address = p["image"]
+        artist = p["artistName"]
+        year = p["yearAsString"]
+        modalid = "c" + str(p["contentId"])
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\" ><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "</p></div></div></div></div>")
+    return modals
     
 
 #the tokengetter is automatically called to check who is logged in.
@@ -139,4 +158,4 @@ def get_search_results(data):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
