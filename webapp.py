@@ -90,7 +90,7 @@ def renderPage1():
         data = json.load(art_data)
     pieces = get_each(data)
     modals = get_modal(data)
-    return render_template('page1.html', pieces=get_each(data), modals=get_modal(data))
+    return render_template('page1.html', pieces=get_each(data), modals=modals[0], imgwidth=modals[1])
 
 @app.route('/page2')
 def renderPage2():
@@ -140,15 +140,17 @@ def get_modal(data):
     artist = ""
     year = ""
     modalid = ""
+    width = ""
     modals = ""
     for p in data:
         title = p["title"]
         address = p["image"]
         artist = p["artistName"]
         year = p["yearAsString"]
+        width = p["width"]
         modalid = "c" + str(p["contentId"])
-        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\" ><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "</p></div></div></div></div>")
-    return modals
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\" ><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "</p></div></div></div></div>")
+    return modals, width
     
 
 #the tokengetter is automatically called to check who is logged in.

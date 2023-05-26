@@ -31,6 +31,10 @@
 	opacity: 1;
 }
 
+/* .modal {
+	width: {{ imgwidth }};
+} */
+
 /* .modalImg {
 	margin: auto;
 } */
