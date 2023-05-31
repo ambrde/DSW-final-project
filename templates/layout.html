@@ -20,6 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	
     <title>{% block title %}{% endblock %} - My Webpage</title>
 
 
@@ -36,7 +38,7 @@
               {% set cls = "alert alert-danger alert-dismissible" %}
             {% endif %}
             <div class="{{ cls }}">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <button type="button" class="btn-close" data-dismiss="alert"></button>
               {{ message }}
             </div>
          {% endfor %}
