@@ -31,6 +31,10 @@
 	opacity: 1;
 }
 
+span.right {
+	float: right;
+}
+
 /* .modal {
 	width: {{ imgwidth }};
 } */
