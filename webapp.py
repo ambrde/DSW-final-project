@@ -142,7 +142,7 @@ def get_modal(data):
         artist = p["artistName"]
         year = p["yearAsString"]
         modalid = "c" + str(p["contentId"])
-        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<span class=\"material-icons right\">favorite_border</span></p></div></div></div></div>")
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<span class=\"far fa-heart right\"></span></p></div></div></div></div>")
     return modals
     
 

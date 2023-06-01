@@ -31,8 +31,13 @@
 	opacity: 1;
 }
 
+.fa-heart{
+	font-size: 22px;
+}
+
 span.right {
 	float: right;
+	cursor: pointer;
 }
 
 /* .modal {
