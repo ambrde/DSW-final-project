@@ -47,10 +47,6 @@ collection = db['artpieces'] #TODO: put the name of the collection here
 def inject_logged_in():
     return {"logged_in":('github_token' in session)}
 
-@app.route('/')
-def home():
-    return render_template('home.html')
-
 # #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
@@ -80,18 +76,20 @@ def authorized():
     return redirect('/')
 
 
-@app.route('/page1')
-def renderPage1():
+@app.route('/')
+def renderHome():
     with open("artdata.json") as art_data:
         data = json.load(art_data)
     pieces = get_each(data)
     modals = get_modal(data)
     return render_template('page1.html', pieces=get_each(data), modals=get_modal(data))
 
-@app.route('/page2')
+@app.route('/your-favorites')
 def renderPage2():
-    add_favorite(session['user_data']['login'], "235567")
-    return render_template('page2.html')
+    with open("artdata.json") as art_data:
+        data = json.load(art_data)
+    favorites = get_favorites
+    return render_template('page2.html', favorites=get_favorites(data))
     
 @app.route('/search-results')
 def renderResults():
@@ -101,7 +99,13 @@ def renderResults():
     searchterm = str(request.args['searchterm'])
     modals = get_modal(data)
     return render_template('search-results.html', count=results[0], results=results[1], searchterm = str(request.args['searchterm']), modals=get_modal(data))
-    
+
+@app.route("/favorite")    
+def add_favorite():
+    # contentId = request.form["contentId"]
+    doc = {"username": session['user_data']['login'], "contentId": request.form["contentId"], "favorite": True}
+    collection.insert_one(doc)
+     
 def get_each(data):
     # titles = []
     # addresses = []
@@ -116,24 +120,7 @@ def get_each(data):
         modalid = "c" + str(p["contentId"])
         pieces += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + title + "</div></div>")
     return pieces    
-
-def get_search_results(data):
-    count = 0
-    results = ""
-    # modalid = ""
-    searchterm = str(request.args['searchterm'])
-    for p in data:
-        modalid = "c" + str(p["contentId"])
-        if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
-            count = count + 1
-            results += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
-    return [int(count), results]
-
-@app.route("/favorite")    
-def add_favorite(contentId):
-    doc = {"username": session['user_data']['login'], "contentId": contentId, "favorite": True}
-    collection.insert_one(doc)
-    
+   
 def get_modal(data):
     # title = ""
     # address = ""
@@ -148,8 +135,30 @@ def get_modal(data):
         year = p["yearAsString"]
         contentId = p["contentId"]
         modalid = "c" + str(p["contentId"])
-        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<form action=\"add_favorite(" + str(contentId) + ")\"><button class=\"far fa-heart right value=\"" + str(contentId) + "\"></button></form></p></div></div></div></div>")
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<form action=\"/favorite\")\"><button class=\"far fa-heart right\"></button><input type=\"hidden\" id=\"contentId\" value=\"" + str(contentId) + "\"</form></p></div></div></div></div>")
     return modals
+    
+def get_search_results(data):
+    count = 0
+    results = ""
+    # modalid = ""
+    searchterm = str(request.args['searchterm'])
+    for p in data:
+        modalid = "c" + str(p["contentId"])
+        if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
+            count = count + 1
+            results += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
+    return [int(count), results]
+   
+def get_favorites(data):
+    favorites = ""
+    # for doc in collection.find({"username": session['user_data']['login']}):
+        # favorites = favorites + 1
+    for p in data:
+        modalid = "c" + str(p["contentId"])
+        if request.form["contentId"] == p["contentId "]:
+            favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
+    return favorites
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
