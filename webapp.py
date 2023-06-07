@@ -88,7 +88,7 @@ def renderHome():
 def renderPage2():
     with open("artdata.json") as art_data:
         data = json.load(art_data)
-    favorites = get_favorites
+    favorites = get_favorites(data)
     return render_template('page2.html', favorites=get_favorites(data))
     
 @app.route('/search-results')
@@ -100,18 +100,15 @@ def renderResults():
     modals = get_modal(data)
     return render_template('search-results.html', count=results[0], results=results[1], searchterm = str(request.args['searchterm']), modals=get_modal(data))
 
-@app.route("/favorite")    
+@app.route("/favorite", methods = ["POST","GET"])    
 def add_favorite():
-    # contentId = request.form["contentId"]
-    doc = {"username": session['user_data']['login'], "contentId": request.form["contentId"], "favorite": True}
+    contentId = request.form.get("contentId")
+    doc = {"username": session['user_data']['login'], "contentId": contentId, "favorite": True}
     collection.insert_one(doc)
+    return contentId
      
 def get_each(data):
-    # titles = []
-    # addresses = []
-    # artists = []
     pieces = ""
-    # modalid = ""
     for p in data:
         title = p["title"]
         address = p["image"]
@@ -122,11 +119,6 @@ def get_each(data):
     return pieces    
    
 def get_modal(data):
-    # title = ""
-    # address = ""
-    # artist = ""
-    # year = ""
-    # modalid = ""
     modals = ""
     for p in data:
         title = p["title"]
@@ -135,7 +127,7 @@ def get_modal(data):
         year = p["yearAsString"]
         contentId = p["contentId"]
         modalid = "c" + str(p["contentId"])
-        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<form action=\"/favorite\")\"><button class=\"far fa-heart right\"></button><input type=\"hidden\" id=\"contentId\" value=\"" + str(contentId) + "\"</form></p></div></div></div></div>")
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<form action=\"/favorite\" method=\"post\"><button class=\"far fa-heart right\" id=\"contentId\" name=\"" + str(contentId) + "\"></button></form></p></div></div></div></div>")
     return modals
     
 def get_search_results(data):
@@ -156,8 +148,9 @@ def get_favorites(data):
         # favorites = favorites + 1
     for p in data:
         modalid = "c" + str(p["contentId"])
-        if request.form["contentId"] == p["contentId "]:
-            favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
+        for doc in collection.find({"username": session['user_data']['login']}):
+            if request.form.get("contentId") == p["contentId"]:
+                favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
     return favorites
 
 #the tokengetter is automatically called to check who is logged in.
