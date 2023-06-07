@@ -92,7 +92,8 @@ def renderPage2():
     with open("artdata.json") as art_data:
         data = json.load(art_data)
     favorites = get_favorites(data)
-    return render_template('page2.html', favorites=get_favorites(data))
+    modals = get_modal(data)
+    return render_template('page2.html', favcount=favorites[0], favorites=favorites[1], modals=get_modal(data))
     
 @app.route('/search-results')
 def renderResults():
@@ -145,17 +146,20 @@ def get_search_results(data):
         if searchterm.lower() in p["title"].lower() or searchterm.lower() in p["artistName"].lower():
             count = count + 1
             results += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
-    return [int(count), results]
+    return count, results
    
 def get_favorites(data):
     favcount = 0
+    favorites = ""
     document = collection.find_one({"username": session['user_data']['login']})
     print(document)
     for p in data:
+        modalid = "c" + str(p["contentId"])
         if str(p["contentId"]) in document['favorites']:
             favcount = favcount + 1
+            favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
     print(favcount)
-    return favcount
+    return favcount, favorites
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter

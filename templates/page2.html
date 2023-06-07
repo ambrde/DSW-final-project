@@ -8,8 +8,15 @@
 {% if logged_in %}
 
 	<h1>Your Favorites</h1>
+	<p>You have {{ favcount }} favorites.</p>
 
-	{{ favorites }}
+	<div>
+		{{ modals }}
+	</div>
+
+	<div class="row">
+		{{ favorites }}
+	</div>
   
 {% else %}
 
