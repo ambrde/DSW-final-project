@@ -5,10 +5,15 @@
 {% block title %}Favorites{% endblock %}
 
 {% block content %}
+{% if logged_in %}
 
-  <h1>Your Favorites</h1>
+	<h1>Your Favorites</h1>
 
-  {{ favorites }}
+	{{ favorites }}
   
+{% else %}
 
+	<h4>You must be logged in to see your favorites.</h4>
+	
+{% endif %}
 {% endblock %}

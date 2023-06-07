@@ -68,6 +68,9 @@ def authorized():
         try:
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
+            if session['user_data']['login'] not in collection.find():
+                doc = {"username": session['user_data']['login'], "favorites": []}
+                collection.insert_one(doc)
             flash('You were successfully logged in as ' + session['user_data']['login'] + '.')
         except Exception as inst:
             session.clear()
@@ -102,10 +105,12 @@ def renderResults():
 
 @app.route("/favorite", methods = ["POST","GET"])    
 def add_favorite():
-    contentId = request.form.get("contentId")
-    doc = {"username": session['user_data']['login'], "contentId": contentId, "favorite": True}
-    collection.insert_one(doc)
-    return contentId
+    # print(list(request.form.keys())[0])
+    contentId = list(request.form.keys())[0]
+    doc = {"$push": {"favorites": contentId}}
+    collection.update_one({"username": session['user_data']['login']}, doc)
+    flash("Added to favorites")
+    return redirect("/")
      
 def get_each(data):
     pieces = ""
@@ -143,15 +148,14 @@ def get_search_results(data):
     return [int(count), results]
    
 def get_favorites(data):
-    favorites = ""
-    # for doc in collection.find({"username": session['user_data']['login']}):
-        # favorites = favorites + 1
+    favcount = 0
+    document = collection.find_one({"username": session['user_data']['login']})
+    print(document)
     for p in data:
-        modalid = "c" + str(p["contentId"])
-        for doc in collection.find({"username": session['user_data']['login']}):
-            if request.form.get("contentId") == p["contentId"]:
-                favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
-    return favorites
+        if str(p["contentId"]) in document['favorites']:
+            favcount = favcount + 1
+    print(favcount)
+    return favcount
 
 #the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
