@@ -104,14 +104,23 @@ def renderResults():
     modals = get_modal(data)
     return render_template('search-results.html', count=results[0], results=results[1], searchterm = str(request.args['searchterm']), modals=get_modal(data))
 
-@app.route("/favorite", methods = ["POST","GET"])    
+@app.route("/favorite", methods = ["GET", "POST"])    
 def add_favorite():
-    # print(list(request.form.keys())[0])
+    print(list(request.form.keys())[0])
     contentId = list(request.form.keys())[0]
     doc = {"$push": {"favorites": contentId}}
     collection.update_one({"username": session['user_data']['login']}, doc)
     flash("Added to favorites")
-    return redirect("/")
+    return redirect(request.referrer)
+
+@app.route("/removefavorite", methods = ["GET", "POST"])
+def remove_favorite():
+    print(list(request.form.keys())[0])
+    contentId = list(request.form.keys())[0]
+    rdoc = {"$pull": {"favorites": contentId}}
+    collection.update_one({"username": session['user_data']['login']}, rdoc)
+    flash("Removed from favorites")
+    return redirect(request.referrer)
      
 def get_each(data):
     pieces = ""
@@ -133,7 +142,7 @@ def get_modal(data):
         year = p["yearAsString"]
         contentId = p["contentId"]
         modalid = "c" + str(p["contentId"])
-        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "<form action=\"/favorite\" method=\"post\"><button class=\"far fa-heart right\" id=\"contentId\" name=\"" + str(contentId) + "\"></button></form></p></div></div></div></div>")
+        modals += Markup("<div class=\"modal\" id=\"" + modalid + "\"><div class=\"modal-dialog modal-dialog-centered modal-xl\"><div class=\"modal-content\"><div class=\"modal-header\"><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><img src=\"" + address + "\" class=\"img-fluid\"" + "alt=\"" + title + "\"><br><p>" + title + "<br>" + artist + "<br>" + year + "</p><span><form action=\"/favorite\" method=\"post\"><button class=\"far fa-heart right\" class=\"fas fa-heart right\" id=\"contentId\" name=\"" + str(contentId) + "\"></button></form><form action=\"/removefavorite\" method=\"post\"><button class=\"right\" id=\"contentId\" name=\"" + str(contentId) + "\">remove</button></form> </span></div></div></div></div>")
     return modals
     
 def get_search_results(data):
@@ -151,6 +160,8 @@ def get_search_results(data):
 def get_favorites(data):
     favcount = 0
     favorites = ""
+    # removefavorite = ""
+    # contentId = list(request.form.keys())[0]
     document = collection.find_one({"username": session['user_data']['login']})
     print(document)
     for p in data:
@@ -158,6 +169,7 @@ def get_favorites(data):
         if str(p["contentId"]) in document['favorites']:
             favcount = favcount + 1
             favorites += Markup("<div class=\"col-sm-4 col-md-3 col-lg-2 col-xxl-1 container\"><img src=\"" + p["image"] + "\"" + "alt=\"" + p["title"] + "\"" + "class=\"image\" data-bs-toggle=\"modal\" data-bs-target=\"#" + modalid + "\"><div class=\"text\">" + p["title"] + "</div></div>")
+            ## removefavorite += Markup("<form action=\"/removefavorite\" method=\"post\"><button id=\"contentId\" name=\"" + str(contentId) + "\"></button></form>")
     print(favcount)
     return favcount, favorites
 

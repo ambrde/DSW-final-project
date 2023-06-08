@@ -1,3 +1,7 @@
+#content {
+	margin: 15px;
+}
+
 .container {
 	position: relative;
 }
@@ -41,11 +45,3 @@ button.right {
 	float: right;
 	cursor: pointer;
 }
-
-/* .modal {
-	width: {{ imgwidth }};
-} */
-
-/* .modalImg {
-	margin: auto;
-} */
