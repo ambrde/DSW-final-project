@@ -2,12 +2,27 @@
 
 {% set active_page = "page2" %}
 
-{% block title %}page2{% endblock %}
+{% block title %}Favorites{% endblock %}
 
 {% block content %}
+{% if logged_in %}
 
-  <h1>This is Page 2</h1>
+	<h1>Your Favorites</h1>
+	<p>You have {{ favcount }} favorites.</p>
 
-  <p>Lorem ipsum</p>
+	<div>
+		{{ modals }}
+	</div>
 
+	<div class="row">
+		{{ favorites }}
+	</div>
+
+	{{ removefavorite }}
+  
+{% else %}
+
+	<h4>You must be logged in to see your favorites.</h4>
+	
+{% endif %}
 {% endblock %}

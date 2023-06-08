@@ -1,3 +1,7 @@
+#content {
+	margin: 15px;
+}
+
 .container {
 	position: relative;
 }
@@ -31,14 +35,13 @@
 	opacity: 1;
 }
 
-span.right {
-	float: right;
+.fa-heart{
+	font-size: 22px;
 }
 
-/* .modal {
-	width: {{ imgwidth }};
-} */
-
-/* .modalImg {
-	margin: auto;
-} */
+button.right {
+	border: none;
+	background-color: white;
+	float: right;
+	cursor: pointer;
+}
